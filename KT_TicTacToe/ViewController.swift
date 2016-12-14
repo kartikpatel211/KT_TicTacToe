@@ -39,10 +39,89 @@ class ViewController: UIViewController {
     let n = 3
     var arrData = [[Int]]()
     
+    let playerOne = Player(name: "A", isStartingPlayer: true, assignedValue: 0, move: 0)
+    let playerTwo = Player(name: "B", isStartingPlayer: false, assignedValue: 1, move: 0)
+    
+    var moveNumber = 1
+    var currentPlayer : Player?
+    var totalPlayers = 2
+    
+    func setCurrentPlayer(){
+        if moveNumber % totalPlayers == 1 {
+            if playerOne.isStartingPlayer == true {
+                currentPlayer = playerOne
+            }else {
+                currentPlayer = playerTwo
+            }
+        } else {
+            if playerOne.isStartingPlayer == false {
+                currentPlayer = playerOne
+            }else {
+                currentPlayer = playerTwo
+            }
+        }
+    }
+    func performMove(row: Int, column: Int){
+        if arrData[row][column] > -1 {
+            // error - row and column is alreay used by player
+            print("error - row and column is alreay used by player")
+            return
+        }
+        arrData[row][column] = currentPlayer!.assignedValue
+        moveNumber += 1
+        
+        if let winnerPlayer = checkResult() {
+            print("Winner Name: \(winnerPlayer.name)")
+            // show winner player and close the game
+        } else if CheckIsMoveAvailable() == false{
+            print("No moves available, game is closed")
+            // close the game without any winner
+        } else {
+            setCurrentPlayer()
+        }
+    }
+    func CheckIsMoveAvailable() -> Bool {
+        if moveNumber > n*n {
+            return false
+        }
+        return true
+    }
     func generateBase(number: Int) {
          arrData = [[Int]](repeating: [Int](repeating: -1, count: n), count: n)
     }
-    
+    func checkResult() ->  Player? {
+        if let res = checkResultForRows() {
+            if res == currentPlayer!.assignedValue {
+                return currentPlayer!
+            } else {
+                // error
+                return nil
+            }
+        } else if let res = checkResultForColumns() {
+            if res == currentPlayer!.assignedValue {
+                return currentPlayer!
+            } else {
+                // error
+                return nil
+            }
+        } else if let res = checkResultForLeftDiagonal() {
+            if res == currentPlayer!.assignedValue {
+                return currentPlayer!
+            } else {
+                // error
+                return nil
+            }
+        } else if let res = checkResultForRightDiagonal() {
+            if res == currentPlayer!.assignedValue {
+                return currentPlayer!
+            } else {
+                // error
+                return nil
+            }
+        } else {
+            return nil
+        }
+    }
     func checkResultForRows() -> Int? {
         
         for i in 0..<n {
@@ -77,7 +156,7 @@ class ViewController: UIViewController {
         }
         return nil
     }
-    func checkLeftDiagonal() -> Int? {
+    func checkResultForLeftDiagonal() -> Int? {
         var isMatched = true
         let firstValue = arrData[0][0]
         
@@ -92,7 +171,7 @@ class ViewController: UIViewController {
         }
         return nil
     }
-    func checkRightDiagonal() -> Int? {
+    func checkResultForRightDiagonal() -> Int? {
         var isMatched = true
         let firstValue = arrData[0][n-1]
         
